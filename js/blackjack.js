@@ -19,9 +19,8 @@ function card(code, name, suit, rank, value) { //suit = szín, rank = number/fac
 
 //list of the cards, wich are in the deck
 var list_of_cards = ["clubs_2", "clubs_3", "clubs_4", "clubs_5", "clubs_6", "clubs_7", "clubs_8", "clubs_9", "clubs_10", "clubs_j", "clubs_q", "clubs_k", "clubs_a", "spades_2", "spades_3", "spades_4", "spades_5", "spades_6", "spades_7", "spades_8", "spades_9", "spades_10", "spades_j", "spades_q", "spades_k", "spades_a", "diamonds_2", "diamonds_3", "diamonds_4", "diamonds_5", "diamonds_6", "diamonds_7", "diamonds_8", "diamonds_9", "diamonds_10", "diamonds_j", "diamonds_q", "diamonds_k", "diamonds_a", "hearts_2", "hearts_3", "hearts_4", "hearts_5", "hearts_6", "hearts_7", "hearts_8", "hearts_9", "hearts_10", "hearts_j", "hearts_q", "hearts_k", "hearts_a"];
-
-
-
+//temporary parmeter to fill out the deck
+var cards_in_deck = [];
 //the deck array and length (this is permanent, only current_deck can change)
 var deck = [];
 var deck_size;
@@ -40,12 +39,14 @@ function define_deck(number_of_decks) {
 		name = cards_rank + " of " + cards_suit;
 		return name;
 	}
+
 	//the suit of cards
 	function cards_suit(cards_code) {
 		suit = cards_code.split("_")[0];
 		suit = suit[0].toUpperCase() + suit.substr(1);
 		return suit;
 	}
+
 	//the rank of cards
 	function cards_rank(cards_code) {
 		rank = cards_code.split("_")[1].toUpperCase();
@@ -63,6 +64,7 @@ function define_deck(number_of_decks) {
 		}
 		return rank;
 	}
+
 	//the value of cards
 	function cards_value(cards_rank) {
 		if (!isNaN(cards_rank)) {
@@ -95,10 +97,10 @@ function define_deck(number_of_decks) {
 		rank = cards_rank(list_of_cards[i]);
 		name = cards_name(suit, rank);
 		value = cards_value(rank);
-		list_of_cards[i] = new card(code, name, suit, rank, value);
+		cards_in_deck[i] = new card(code, name, suit, rank, value);
 		for (n = 0; n < number_of_decks; n++) {
-			list_of_cards[i].give_to_deck(deck);
-			list_of_cards[i].give_to_deck(current_deck);
+			cards_in_deck[i].give_to_deck(deck);
+			cards_in_deck[i].give_to_deck(current_deck);
 		}
 
 		// console.log(deck[i].name);
@@ -122,8 +124,10 @@ function participant(name) {
 	this.blackjack = false; //has the player blackjack (in the beginning of the game false)
 	this.give_to_players = function() {
 		players.push(this.name);
+		//{name: this.name, cards: this.cards, total: this.total, soft: this.soft, soft_total: this.soft_total, aces: this.aces, blackjack: this.blackjack}
 	}
 }
+
 
 
 //all of the players
@@ -163,6 +167,7 @@ function show_card(card, player) {
 	img.attr("src", "img/cards/" + card.code + ".jpg")
 	img.attr("title", card.name);
 	img.attr("alt", card.name)
+
 	//define where should it be inserted
 	$("#" + player + " .cards").append(img);
 }
@@ -172,10 +177,13 @@ function show_card(card, player) {
 //write out the total points
 function show_points(player) {
 	var points;
+
 	//check maybe somebody has a blackjack
 	check_blackjack(player);
+
 	// if the player has no ace
 	points = player.total;
+
 	//if the player has ace(s)
 	if (player.soft === true) {
 		if (player.total > 21) {
@@ -202,13 +210,13 @@ function show_points(player) {
 
 
 
-//makes all of the buttons invisible but the again button visible
+//makes all of the buttons invisible but the deal button visible
 function end() {
 	console.log("player: " + player1.total);
 	console.log("dealer: " + dealer.total);
 	$("#result").html(result);
 	visible("#hit, #double, #split, #stand", "hidden");
-	visible("#again", "visible");
+	visible("#deal", "visible");
 }
 
 
@@ -401,28 +409,25 @@ function dealer_draws() {
 
 
 
-//start the game
-function lets_play() {
-
-	//define with how many decks do we play
-	number_of_decks = 1;
-	//fill in the cards in the deck and current_deck
-	define_deck(number_of_decks);
-	//and their length
-	deck_size = deck.length;
-	current_deck_size = current_deck.length;
-
-	//define the dealer and the players
-	dealer = new participant("dealer");
-	player1 = new participant("player1");
-	//give them to the players array
-	dealer.give_to_players();
-	player1.give_to_players();
-
-	//gives the value of the variables
+//start the game without shuffle the deck
+function deal() {
+	//empty the playing field and the result's field
+	$(".cards, #result, .total_points").empty();
+	//empty the variables
+	result = "";
+	//gives the value of the variables of the beginning of the game
 	blackjack = false;
 	push = false;
 	bust = false;
+
+	dealer.soft = false;
+	player1.soft = false;
+	//empty the hands of the players
+	dealer.cards = [];
+	player1.cards = [];
+
+
+	//start the game
 
 	//the deal
 	for (i = 0; i < 2; i++) {
@@ -457,6 +462,7 @@ function lets_play() {
 		end();
 	} else if (blackjack === false) {
 		visible("#hit, #double, #stand", "visible");
+		visible("#deal", "hidden");
 		//in some rules is it only possible to double down only by 9, 10, 11 total hand 
 		// if (player1.total === 9 || player1.total === 10 || player1.total === 11) {
 		// 	visible("#double", "visible");
@@ -466,14 +472,51 @@ function lets_play() {
 
 
 
+//start the game
+function lets_play() {
+	//empty the playing field and the result's field
+	$(".cards, #result, .total_points").empty();
+	//empty the variables
+	result = "";
+	deck = [];
+	current_deck = [];
+	players = [];
+
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! values from options !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//define with how many decks do we play
+	number_of_decks = 1;
+	//define the penetration (%) (when should we shuffle the deck again, after how many percent)
+	part_of_deck = 0.65;
+
+	//fill in the cards in the deck and current_deck
+	define_deck(number_of_decks);
+	//and their length
+	deck_size = deck.length;
+	current_deck_size = current_deck.length;
+
+	//define the dealer and the players
+	dealer = new participant("dealer");
+	player1 = new participant("player1");
+	//give them to the players array
+	dealer.give_to_players();
+	player1.give_to_players();
+}
+
+
+
 $(document).ready(function() {
 	//hide/show the buttons
-	visible("#player1 button", "hidden");
-	visible("#start", "visible");
-	$("#start").click(function() {
-		//run the game
+	visible("#player1 button, #deal", "hidden");
+
+	$("#new").click(function() {
+		//run a new game
 		lets_play();
-		visible("#start", "hidden");
+		end();
+	});
+
+	$("#deal").click(function() {
+		//run the game
+		deal();
 	});
 
 	$("#hit").click(function() {
@@ -494,10 +537,6 @@ $(document).ready(function() {
 	$("#stand").click(function() {
 		stand();
 		console.log(dealer.total);
-	});
-
-	$("#again").click(function() {
-		location.reload();
 	});
 
 })
