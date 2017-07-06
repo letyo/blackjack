@@ -47,12 +47,11 @@
 
 		</div>
 		<div id="buttons">
-			<button id="start">Let's play!</button>
+			<button id="deal">Deal</button>
 			<button id="hit">Hit!</button>
 			<button id="double">Double!</button>
 			<button id="split">/*Split!*/</button>
 			<button id="stand">Stand!</button>
-			<button id="again">Play again</button>
 		</div>
 	</div>
 
