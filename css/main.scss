@@ -62,15 +62,68 @@ body {
 	height: 20px;
 }
 
+
+
+
+
+
+
 .cards {
-	display: inline-block;
 	background-color: blue;
 	width: 50%;
 	height: 150px;
+
+	display: inline-block;
+	white-space: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
+	text-align: center;
 	img {
 		opacity: 0;
 	}
 }
+
+/* ------------------- the chips -------------------- */
+
+.get_bet_buttons .get_bet {
+	border-radius: 100%;
+	border: 5px solid black;
+	height: 45px;
+	width: 45px;
+	font-weight: bold;
+	font-size: 11px;
+	box-shadow: 0 0 2px 1px rgba(0, 0, 0, 1);
+}
+
+.get_bet_buttons .get_bet[value="1"] {
+	border-color: #9e9e9e;
+}
+
+.get_bet_buttons .get_bet[value="5"] {
+	border-color: red;
+}
+
+.get_bet_buttons .get_bet[value="10"] {
+	border-color: blue;
+}
+
+.get_bet_buttons .get_bet[value="25"] {
+	border-color: green;
+}
+
+.get_bet_buttons .get_bet[value="50"] {
+	border-color: yellow;
+}
+
+.get_bet_buttons .get_bet[value="100"] {
+	border-color: black;
+}
+
+.get_bet_buttons .get_bet[value="200"] {
+	border-color: purple;
+}
+
+/* ------------------- show cards - animations -------------------- */
 
 .show {
 	-webkit-animation-name: show_card;
@@ -87,8 +140,6 @@ body {
 	animation-duration: 1s;
 	animation-fill-mode: forwards;
 }
-
-/* ------------------- anmitions -------------------- */
 
 @-webkit-keyframes show_card {
     0% {-webkit-filter: blur(2px); opacity: 0};
@@ -108,4 +159,99 @@ body {
 @keyframes show_blackcard {
     0% {filter: brightness(0%); opacity: 0};
     100% {filter: brightness(0%); opacity: 1};
+}
+
+/* ------------------- the modals -------------------- */
+
+//the color of the texts in the modals
+$modal_text_color: #bdbdbd;
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black; /* fallback color */
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal_content {
+    overflow: auto;
+    margin: 10vh auto;
+    width: 80vw;
+    min-width: 300px;
+    height: 80vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
+    border-radius: 5px;
+    background-color: black; /* fallback color */
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal_header {
+    padding: 5px 10px;
+}
+
+/* a modal címe */
+.modal_header h1 {
+    text-align: center;
+    color: $modal_text_color;
+}
+
+.close {
+    float: right;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    color: $modal_text_color;
+}
+
+.close:hover, 
+.close:focus {
+    color: red;
+}
+
+.modal_body {
+    text-align: left;
+    margin: 10px;
+    margin-top: 5px;
+    color: $modal_text_color;
+}
+
+#options button {
+	font-weight: bold;
+}
+
+#options input,
+#options select,
+#options button {
+	border-radius: 5px;
+}
+
+#options input:focus,
+#options select:focus,
+#options button:hover {
+	border: 1px solid rgba(40, 0, 80, 0.5);
+	background-color: rgba(55, 0, 110, 0.5);
+	color: $modal_text_color;
+}
+
+/* ------------------- the scrollbar in the modals -------------------- */
+
+#options div::-webkit-scrollbar,
+#rules div::-webkit-scrollbar {
+  width: 12px;  /* for vertical scrollbars */
+  height: 12px; /* for horizontal scrollbars */
+}
+
+#options div::-webkit-scrollbar-track,
+#rules div::-webkit-scrollbar-track {
+  background: rgba(40, 0, 80, 0.5);
+}
+
+#options div::-webkit-scrollbar-thumb,
+#rules div::-webkit-scrollbar-thumb {
+  background: rgba(55, 0, 110, 0.5);
 }
