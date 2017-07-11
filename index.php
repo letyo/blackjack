@@ -43,11 +43,31 @@
 		<div class="total_points">
 
 		</div>
+		<div id="money">
+
+		</div>
 		<div class="cards">
 
 		</div>
+		<div id="bet">
+
+		</div>
+		<div id="prize">
+
+		</div>
 		<div id="buttons">
-			<button id="deal">Deal</button>
+			<div class="get_bet_buttons">
+				<button class="get_bet" value="1">1</button>
+				<button class="get_bet" value="5">5</button>
+				<button class="get_bet" value="10">10</button>
+				<button class="get_bet" value="25">25</button>
+				<button class="get_bet" value="50">50</button>
+				<button class="get_bet" value="100">100</button>
+				<button class="get_bet" value="200">200</button>
+			</div>
+			<input class="get_bet" type="number" name="get_bet" min="1" max="200" autocomplete="off">
+			<button id="get_bet" class="get_bet">Bet!</button>
+			<button id="deal">Deal!</button>
 			<button id="hit">Hit!</button>
 			<button id="double">Double!</button>
 			<button id="split">/*Split!*/</button>
