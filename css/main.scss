@@ -34,14 +34,78 @@ body {
 }
 
 .total_points {
+	display: inline-block;
 	background-color: black;
 	color: white;
 	width: 50%;
 	height: 20px;
 }
 
+#money {
+	display: inline-block;
+	background-color: brown;
+	width: 25%;
+	height: 20px;
+}
+
+#bet {
+	display: inline-block;
+	background-color: purple;
+	width: 25%;
+	height: 20px;
+}
+
+#prize {
+	display: inline-block;
+	background-color: orange;
+	width: 25%;
+	height: 20px;
+}
+
 .cards {
+	display: inline-block;
 	background-color: blue;
 	width: 50%;
 	height: 150px;
+	img {
+		opacity: 0;
+	}
+}
+
+.show {
+	-webkit-animation-name: show_card;
+	-webkit-animation-duration: 1s;
+	animation-name: show_card;
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+}
+
+.black_card {
+	-webkit-animation-name: show_blackcard;
+	-webkit-animation-duration: 1s;
+	animation-name: show_blackcard;
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+}
+
+/* ------------------- anmitions -------------------- */
+
+@-webkit-keyframes show_card {
+    0% {-webkit-filter: blur(2px); opacity: 0};
+    100% {-webkit-filter: blur(0px); opacity: 1};
+}
+
+@keyframes show_card {
+    0% {filter: blur(2px); opacity: 0};
+    100% {filter: blur(0px); opacity: 1};
+}
+
+@-webkit-keyframes show_blackcard {
+    0% {-webkit-filter: brightness(0%); opacity: 0};
+    100% {-webkit-filter: brightness(0%); opacity: 1};
+}
+
+@keyframes show_blackcard {
+    0% {filter: brightness(0%); opacity: 0};
+    100% {filter: brightness(0%); opacity: 1};
 }

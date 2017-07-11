@@ -142,6 +142,11 @@ var player1;
 
 
 
+//define with how many decks do we play
+var number_of_decks;
+//define the penetration (%) (when should we shuffle the deck again, after how many percent)
+var part_of_decks;
+
 //is there a blackjack
 var blackjack;
 //is there a push
@@ -150,6 +155,14 @@ var push;
 var bust;
 //the result (the game saves all of the result in this variable)
 var result;
+//the winner of the game (can be push too)
+var winner;
+//money of the player
+var money = 0;
+//the bet
+var bet = 0;
+//how much the player won
+var prize = 0;
 
 
 
@@ -161,15 +174,27 @@ function visible(id, visibility) {
 
 
 //show the card
-function show_card(card, player) {
+function show_card(card, player, black) {
 	//define the cards image
 	var img = $("<img/>");
 	img.attr("src", "img/cards/" + card.code + ".jpg")
 	img.attr("title", card.name);
 	img.attr("alt", card.name)
 
-	//define where should it be inserted
-	$("#" + player + " .cards").append(img);
+	//define where should it be inserted, but if it is the second card of the dealer, then don't show it
+	if (black === true) {
+		$("#" + player + " .cards").append(img).children(":nth-child(2)").addClass("black_card");
+	} else {
+		$("#" + player + " .cards").append(img).children().addClass("show");
+	}
+}
+
+
+
+//show dealers second card
+function show_dealers_second() {
+	$("#dealer .cards").children(":nth-child(2)").removeClass("black_card").addClass("show");
+		show_points(dealer);
 }
 
 
@@ -203,9 +228,42 @@ function show_points(player) {
 		}
 	}
 
+	//if the player is the dealer, then show only the value of the first card
+	if (player.name === "dealer" && $("#" + player.name + " .cards").children(":nth-child(2)").attr("class") === "black_card") {
+		points = player.cards[0].value;
+	}
+
 	console.log(points);
 
 	$("#" + player.name + " .total_points").html(points);
+}
+
+
+
+//show the money of the player
+function show_money() {
+	$("#money").html(money + " €");
+}
+
+
+
+//show the bet of the player
+function show_bet() {
+	$("#bet").html(bet + " €");
+}
+
+
+
+//show the prize if the players win
+function show_prize() {
+	$("#prize").html(prize + " €");
+}
+
+
+
+//write out the result of the game
+function show_result() {
+	$("#result").html(result);
 }
 
 
@@ -214,23 +272,71 @@ function show_points(player) {
 function end() {
 	console.log("player: " + player1.total);
 	console.log("dealer: " + dealer.total);
-	$("#result").html(result);
-	visible("#hit, #double, #split, #stand", "hidden");
-	visible("#deal", "visible");
+	//write out the result
+	show_result();
+
+	console.log(winner);
+	//change the player's money with the bet if he won
+	pay_out();
+
+	//change the visibility of the buttons
+	var rate = 1 - (current_deck_size / deck_size);
+	if (part_of_decks > rate) {
+		visible(".get_bet", "visible");
+		$("input[name=get_bet]").focus();
+	} else {
+		visible("#deal", "hidden");
+		alert("There is no enough card in the deck, it had to be shuffled again!");
+		lets_play();
+	}
+	visible("#hit, #double, #split, #stand, #deal", "hidden");
+}
+
+
+
+//the prize is for the winner
+function pay_out() {
+	console.log(money);
+	console.log(bet);
+	console.log(prize);
+	if (winner === "push") {
+		prize = bet;
+		money = money + prize;
+	} else if (winner === "player1" || winner === "!dealer") {
+		if (player1.blackjack === true) {
+			prize = 2.5 * bet;
+			money = money + prize;
+		} else {
+			prize = 2 * bet;
+			money = money + prize;
+		}
+	}
+	console.log(money);
+	console.log(bet);
+	console.log(prize);
+	//write out the prize
+	show_prize();
+	//show the bet and money and empty the bet, the prize
+	show_bet();
+	show_money();
 }
 
 
 
 //draw a card
-function draw_card(player) { //where to put the drawn card
+function draw_card(player) { //in which hand put the drawn card
 	//choose a card for random from the current deck
 	var chosen_card = Math.floor(Math.random() * current_deck_size);
 
 	//add that card to the hand
 	player.cards.push(current_deck[chosen_card]);
 
-	//show the card on the table
-	show_card(player.cards[player.cards.length - 1], player.name);
+	//show the card on the table but if it is the second card of the dealer, then don't show it
+	if (player.name === "dealer" && player.cards.length === 2) {
+		show_card(player.cards[player.cards.length - 1], player.name, true);
+	} else {
+		show_card(player.cards[player.cards.length - 1], player.name, false);
+	}
 
 	//write out the card on the console
 	console.log(player.name + ": " + current_deck[chosen_card].name);
@@ -328,11 +434,16 @@ function check_bust(player) {
 		}
 	}
 
-	//hide/show the buttons
+	//hide/show the buttons, write out the result and prize
 	if (bust === true) {
 		result = "This is a bust! The " + player.name + " goes bust. The other player is the winner!";
+		winner = "!" + player.name;
 		console.log("This is a bust!");
 		console.log("Bust by " + player.name + ". The other player is the winner!");
+		//the dealer's 2nd card must be showed with the dealer's points
+		show_dealers_second();
+		show_points(dealer);
+
 		end();
 	}
 }
@@ -344,10 +455,10 @@ function check_push(player, bank) {
 	if (player.total === bank.total) {
 		push = true;
 		result = "This is a push!";
+		winner = "push";
 		console.log("This is a push!");
 	}
 
-	//hide/show the buttons
 	if (push === true) {
 		end();
 	}
@@ -357,20 +468,27 @@ function check_push(player, bank) {
 
 //dont draw another card
 function stand() {
+	//the dealer's 2nd card must be showed with the dealer's points
+	show_dealers_second();
+	show_points(dealer);
+
 	dealer_draws();
 
 	//the winner is
 	if (bust === false && push === false) {
 		if (player1.total > dealer.total) {
 			result = "The player wins!";
+			winner = "player1";
 			console.log("The player wins!");
 		} else {
 			result = "The dealer wins!";
+			winner = "dealer";
 			console.log("The dealer wins!");
 		};
+		//hide/show the buttons, write out the result and prize
+		end();
 	};
-	//hide/show the buttons
-	end();
+	
 }
 
 
@@ -388,6 +506,12 @@ function hit(player) {
 
 //draw only one card, then comes the dealer, and see result
 function double(player) {
+	//change the bet and with that the money too
+	bet = 2 * bet;
+	money = money - bet;
+	show_bet();
+	show_money();
+	//draw
 	hit(player);
 	if (bust === false) {
 		stand();
@@ -409,12 +533,14 @@ function dealer_draws() {
 
 
 
-//start the game without shuffle the deck
-function deal() {
-	//empty the playing field and the result's field
-	$(".cards, #result, .total_points").empty();
+//get the bet value, reduced the money with that, and make the deal button visible
+function get_bet() {
+	//empty the playing field, the result's field, the bet field and the prize field
+	$(".cards, #result, .total_points, #bet, #prize").empty();
 	//empty the variables
 	result = "";
+	bet = 0;
+	prize = 0;
 	//gives the value of the variables of the beginning of the game
 	blackjack = false;
 	push = false;
@@ -422,13 +548,46 @@ function deal() {
 
 	dealer.soft = false;
 	player1.soft = false;
+	dealer.blackjack = false;
+	player1.blackjack = false;
+
 	//empty the hands of the players
 	dealer.cards = [];
 	player1.cards = [];
 
+	//put in the bet
+	bet = parseInt($("input[name=get_bet]").val());
+	//if the bet has a bed value then modify it
+	if (bet > 200) {
+		bet = 200;
+		if (bet > money) {
+			bet = money;
+		}
+	} else if (bet <= 200 && bet >= 1) {
+		bet = bet;
+		if (bet > money) {
+			bet = money;
+		}
+	} else {
+		bet = 1;
+	}
+	console.log(bet);
+	//reduced the player money with the bet
+	money = money - bet;
 
-	//start the game
+	//show the bet and the money
+	show_bet();
+	show_money();
 
+	//make the deal button visible and the bet invisible
+	visible("#deal", "visible");
+	visible(".get_bet", "hidden");
+}
+
+
+
+//start the game without shuffle the deck
+function deal() {
 	//the deal
 	for (i = 0; i < 2; i++) {
 		draw_card(player1);
@@ -446,12 +605,15 @@ function deal() {
 	if (dealer.blackjack === true && player1.blackjack === true) {
 		push = true;
 		result = "The dealer and also the player1 have blackjack! This is a push!";
+		winner = "push";
 		console.log("The dealer and the player1 also have blackjack! This is a push!");
 	} else if (dealer.blackjack === true) {
 		result = "This is a blackjack! The dealer wins!";
+		winner = "dealer";
 		console.log("This is a blackjack! The dealer wins!");
 	} else if (player1.blackjack === true) {
 		result = "This is a blackjack! The player1 wins!";
+		winner = "player1";
 		console.log("This is a blackjack! The player1 wins!");
 	} else {
 		blackjack = false;
@@ -459,6 +621,9 @@ function deal() {
 
 	//hide/show the buttons
 	if (blackjack === true) {
+		//the dealer's 2nd card must be showed with the dealer's points
+		show_dealers_second();
+
 		end();
 	} else if (blackjack === false) {
 		visible("#hit, #double, #stand", "visible");
@@ -474,8 +639,8 @@ function deal() {
 
 //start the game
 function lets_play() {
-	//empty the playing field and the result's field
-	$(".cards, #result, .total_points").empty();
+	//empty the playing field, the result's field, the bet field and the prize field
+	$(".cards, #result, .total_points, #bet, #prize").empty();
 	//empty the variables
 	result = "";
 	deck = [];
@@ -486,7 +651,7 @@ function lets_play() {
 	//define with how many decks do we play
 	number_of_decks = 1;
 	//define the penetration (%) (when should we shuffle the deck again, after how many percent)
-	part_of_deck = 0.65;
+	part_of_decks = 0.65;
 
 	//fill in the cards in the deck and current_deck
 	define_deck(number_of_decks);
@@ -500,18 +665,41 @@ function lets_play() {
 	//give them to the players array
 	dealer.give_to_players();
 	player1.give_to_players();
+
+	//write out the money of the player
+	show_money();
+
+	//make the bet button visible
+	visible("#player1 button", "hidden");
+	visible(".get_bet", "visible");
+	$("input[name=get_bet]").focus();
 }
 
 
 
 $(document).ready(function() {
 	//hide/show the buttons
-	visible("#player1 button, #deal", "hidden");
-
+	visible("#player1 button, .get_bet", "hidden");
+	
 	$("#new").click(function() {
+		//by loading of the page the player's money is:
+		money = 1000;
 		//run a new game
 		lets_play();
-		end();
+	});
+
+	$("#get_bet").click(function() {
+		get_bet();
+	});
+
+	$(".get_bet_buttons .get_bet").each(function() {
+		//get the current button
+		var $get_bet_button = $(this);
+		//write the current button value in to the input field of the bet
+		$get_bet_button.click(function() {
+			var value = $get_bet_button.val();
+			$("input[name=get_bet]").val(value);
+		});
 	});
 
 	$("#deal").click(function() {
