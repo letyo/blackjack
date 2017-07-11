@@ -7,19 +7,59 @@
 	<link type="text/css" rel="stylesheet" href="css/main.css"/>
 	<script type="text/javascript" src="js/jQuery.js" defer></script>
 	<script type="text/javascript" src="js/blackjack.js" defer></script>
+	<script type="text/javascript" src="js/modals.js" defer></script>
 </head>
 <body>
 
+<!-- xxxxxxxxxxxxxxxxxxxxxxxx the header xxxxxxxxxxxxxxxxxxxxxxxx -->
+
 	<div id="header">
 		<button id="new">New game</buttons>
-		<button id="options">Options</button>
-		<button id="rules">Rules</button>
-	
-		<!-- the modals -->
-		<div id="rules_content">
-			<!-- <h1>The rules of the life...uhmm..sorry...I wanna say blackjack</h1> -->
+		<button id="options_button">Options</button>
+		<button id="rules_button">Rules</button>
+	</div>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxx the modals xxxxxxxxxxxxxxxxxxxxxxxx -->
+
+	<div id="options" class="modal">
+			
+		<div class="modal_content">
+
+			<div class="modal_header">
+				<!-- The Close Button -->
+				<span id="options_close" class="close">&times;</span>
+				<h1>Options</h1>
+			</div>
+
+			<div class="modal_body">
+<?php
+				include_once "blocks/options.php";
+?>				
+			</div>
+
 		</div>
 	</div>
+
+	<div id="rules" class="modal">
+
+		<div class="modal_content">
+
+			<div class="modal_header">
+				<!-- The Close Button -->
+				<span id="rules_close" class="close">&times;</span>
+				<h1>Rules</h1>
+			</div>
+
+			<div class="modal_body">
+<?php
+				include_once "blocks/rules.php";
+?>				
+			</div>
+
+		</div>
+	</div>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxx the playing field xxxxxxxxxxxxxxxxxxxxxxxx -->
 
 	<div id="dealer">
 		<div class="total_points">
@@ -65,8 +105,8 @@
 				<button class="get_bet" value="100">100</button>
 				<button class="get_bet" value="200">200</button>
 			</div>
-			<input class="get_bet" type="number" name="get_bet" min="1" max="200" autocomplete="off">
-			<button id="get_bet" class="get_bet">Bet!</button>
+			<input class="get_bet" type="text" name="get_bet" min="1" max="200" autocomplete="off" required>
+			<button type="submit" id="get_bet" class="get_bet">Bet!</button>
 			<button id="deal">Deal!</button>
 			<button id="hit">Hit!</button>
 			<button id="double">Double!</button>
