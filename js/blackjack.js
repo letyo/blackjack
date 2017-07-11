@@ -28,6 +28,13 @@ var deck_size;
 var current_deck = [];
 var current_deck_size;
 
+//define with how many decks do we play
+var number_of_decks;
+//define the penetration (%) (when should we shuffle the deck again, after how many percent)
+var part_of_decks;
+//define the penetration (%) (when should we shuffle the deck again, after how many percent)
+var dealer_stands
+
 
 
 /*------------------------------------------------------------------------------------------------------------------------------*/
@@ -81,15 +88,6 @@ function define_deck(number_of_decks) {
 	//how many cards do we have in a deck
 	var decks_size = list_of_cards.length;
 
-	//if the number of decks is not defined, or it is smaller than 1, then it will be 1, if it is bigger than 20, then it will be 20, otherwise it will be the given number
-	if (number_of_decks > 20) {
-		number_of_decks = 20;
-	} else if (number_of_decks >= 1 && number_of_decks <= 20) {
-		number_of_decks = number_of_decks
-	} else {
-		number_of_decks = 1;
-	}
-
 	//fill out the deck array
 	for (i = 0; i < decks_size; i++) {
 		code = list_of_cards[i];
@@ -137,15 +135,6 @@ var dealer;
 var player1;
 
 
-
-/* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  eddig a vonalig minden bele lett építve a lets_play-be xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
-
-
-
-//define with how many decks do we play
-var number_of_decks;
-//define the penetration (%) (when should we shuffle the deck again, after how many percent)
-var part_of_decks;
 
 //is there a blackjack
 var blackjack;
@@ -235,28 +224,28 @@ function show_points(player) {
 
 	console.log(points);
 
-	$("#" + player.name + " .total_points").html(points);
+	$("#" + player.name + " .total_points").html("Points: " + points);
 }
 
 
 
 //show the money of the player
 function show_money() {
-	$("#money").html(money + " €");
+	$("#money").html("Balance: " + money + " €");
 }
 
 
 
 //show the bet of the player
 function show_bet() {
-	$("#bet").html(bet + " €");
+	$("#bet").html("Bet: " + bet + " €");
 }
 
 
 
 //show the prize if the players win
 function show_prize() {
-	$("#prize").html(prize + " €");
+	$("#prize").html("Win: " + prize + " €");
 }
 
 
@@ -275,18 +264,25 @@ function end() {
 	//write out the result
 	show_result();
 
-	console.log(winner);
+console.log(winner);
+
 	//change the player's money with the bet if he won
 	pay_out();
-
 	//change the visibility of the buttons
-	var rate = 1 - (current_deck_size / deck_size);
+	var rate = (1 - (current_deck_size / deck_size)) * 100;
 	if (part_of_decks > rate) {
 		visible(".get_bet", "visible");
 		$("input[name=get_bet]").focus();
 	} else {
 		visible("#deal", "hidden");
 		alert("There is no enough card in the deck, it had to be shuffled again!");
+		//start a new game with a shuffle
+		lets_play();
+	}
+	if (money <= 0) {
+		visible("#deal", "hidden");
+		alert("You have to start a new game! You have no money left!");
+		//start a new game with a shuffle
 		lets_play();
 	}
 	visible("#hit, #double, #split, #stand, #deal", "hidden");
@@ -296,9 +292,11 @@ function end() {
 
 //the prize is for the winner
 function pay_out() {
-	console.log(money);
-	console.log(bet);
-	console.log(prize);
+
+console.log(money);
+console.log(bet);
+console.log(prize);
+
 	if (winner === "push") {
 		prize = bet;
 		money = money + prize;
@@ -311,9 +309,11 @@ function pay_out() {
 			money = money + prize;
 		}
 	}
-	console.log(money);
-	console.log(bet);
-	console.log(prize);
+
+console.log(money);
+console.log(bet);
+console.log(prize);
+
 	//write out the prize
 	show_prize();
 	//show the bet and money and empty the bet, the prize
@@ -522,7 +522,7 @@ function double(player) {
 
 //when the player finished, then draw the dealer
 function dealer_draws() {
-	while (dealer.total < 17 || (dealer.soft_total > 0 && dealer.soft_total < 17 && dealer.total > 21)) {
+	while (dealer.total < dealer_stands || (dealer.soft_total > 0 && dealer.soft_total < dealer_stands && dealer.total > 21)) {
 		hit(dealer);
 	}
 
@@ -571,7 +571,7 @@ function get_bet() {
 	} else {
 		bet = 1;
 	}
-	console.log(bet);
+
 	//reduced the player money with the bet
 	money = money - bet;
 
@@ -588,51 +588,97 @@ function get_bet() {
 
 //start the game without shuffle the deck
 function deal() {
-	//the deal
-	for (i = 0; i < 2; i++) {
-		draw_card(player1);
-		draw_card(dealer);
-	};
-	
-	//the total value of the hands
-	hands_value(player1);
-	hands_value(dealer);
-
-	console.log("player: " + player1.total);
-	console.log("dealer: " + dealer.total);
-
-	//after checking blackjack
-	if (dealer.blackjack === true && player1.blackjack === true) {
-		push = true;
-		result = "The dealer and also the player1 have blackjack! This is a push!";
-		winner = "push";
-		console.log("The dealer and the player1 also have blackjack! This is a push!");
-	} else if (dealer.blackjack === true) {
-		result = "This is a blackjack! The dealer wins!";
-		winner = "dealer";
-		console.log("This is a blackjack! The dealer wins!");
-	} else if (player1.blackjack === true) {
-		result = "This is a blackjack! The player1 wins!";
-		winner = "player1";
-		console.log("This is a blackjack! The player1 wins!");
+	//if there is a bug, and the player could get cards with no bet
+	if (bet === 0) {
+		alert("You're bet is 0! You have to put some money up! If you don't have any, then start a new game!");
+		get_bet();
 	} else {
-		blackjack = false;
+		//the deal
+		for (i = 0; i < 2; i++) {
+			draw_card(player1);
+			draw_card(dealer);
+		};
+		
+		//the total value of the hands
+		hands_value(player1);
+		hands_value(dealer);
+
+		console.log("player: " + player1.total);
+		console.log("dealer: " + dealer.total);
+
+		//after checking blackjack
+		if (dealer.blackjack === true && player1.blackjack === true) {
+			push = true;
+			result = "The dealer and also the player1 have blackjack! This is a push!";
+			winner = "push";
+			console.log("The dealer and the player1 also have blackjack! This is a push!");
+		} else if (dealer.blackjack === true) {
+			result = "This is a blackjack! The dealer wins!";
+			winner = "dealer";
+			console.log("This is a blackjack! The dealer wins!");
+		} else if (player1.blackjack === true) {
+			result = "This is a blackjack! The player1 wins!";
+			winner = "player1";
+			console.log("This is a blackjack! The player1 wins!");
+		} else {
+			blackjack = false;
+		}
+
+		//hide/show the buttons
+		if (blackjack === true) {
+			//the dealer's 2nd card must be showed with the dealer's points
+			show_dealers_second();
+
+			end();
+		} else if (blackjack === false) {
+			visible("#hit, #double, #stand", "visible");
+			visible("#deal", "hidden");
+			//in some rules is it only possible to double down only by 9, 10, 11 total hand 
+			// if (player1.total === 9 || player1.total === 10 || player1.total === 11) {
+			// 	visible("#double", "visible");
+			// }
+		}
+	}
+}
+
+
+
+//save the preferences in the options menu
+function save() {
+	//get the preferences from options
+	number_of_decks = $("input[name=number_of_decks]").val();
+	part_of_decks = $("input[name=part_of_decks]").val();
+	dealer_stands = $("select[name=dealer_stands]").val();
+	
+	//if the number of decks is not defined, or it is smaller than 1, then it will be 1, if it is bigger than 20, then it will be 20, otherwise it will be the given number
+	if (number_of_decks > 20) {
+		number_of_decks = 20;
+	} else if (number_of_decks >= 1 && number_of_decks <= 20) {
+		number_of_decks = number_of_decks
+	} else {
+		number_of_decks = 1;
 	}
 
-	//hide/show the buttons
-	if (blackjack === true) {
-		//the dealer's 2nd card must be showed with the dealer's points
-		show_dealers_second();
-
-		end();
-	} else if (blackjack === false) {
-		visible("#hit, #double, #stand", "visible");
-		visible("#deal", "hidden");
-		//in some rules is it only possible to double down only by 9, 10, 11 total hand 
-		// if (player1.total === 9 || player1.total === 10 || player1.total === 11) {
-		// 	visible("#double", "visible");
-		// }
+	//if the part of decks is not defined, or it is smaller than 0, then it will be 0, if it is bigger than 75, then it will be 75, otherwise it will be the given number
+	if (part_of_decks > 75) {
+		part_of_decks = 75;
+	} else if (part_of_decks >= 0 && part_of_decks <= 75) {
+		part_of_decks = part_of_decks
+	} else {
+		part_of_decks = 65;
 	}
+
+	//if dealer stands not defined then it should be 17
+	if (dealer_stands === 17 || dealer_stands === 18) {
+		dealer_stands = dealer_stands;
+	} else {
+		dealer_stands = 17;
+	}
+
+	//it should be all of the variables in integer type
+	number_of_decks = parseInt(number_of_decks);
+	part_of_decks = parseInt(part_of_decks);
+	dealer_stands = parseInt(dealer_stands);
 }
 
 
@@ -643,15 +689,22 @@ function lets_play() {
 	$(".cards, #result, .total_points, #bet, #prize").empty();
 	//empty the variables
 	result = "";
+	bet = 0;
+	prize = 0;
 	deck = [];
 	current_deck = [];
 	players = [];
+	
+	//gives the value of the variables of the beginning of the game
+	blackjack = false;
+	push = false;
+	bust = false;
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! values from options !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//define with how many decks do we play
-	number_of_decks = 1;
-	//define the penetration (%) (when should we shuffle the deck again, after how many percent)
-	part_of_decks = 0.65;
+	save();
+
+console.log(number_of_decks);
+console.log(part_of_decks);
+console.log(dealer_stands);
 
 	//fill in the cards in the deck and current_deck
 	define_deck(number_of_decks);
@@ -681,7 +734,7 @@ $(document).ready(function() {
 	//hide/show the buttons
 	visible("#player1 button, .get_bet", "hidden");
 	
-	$("#new").click(function() {
+	$("#new, #save_and_play").click(function() {
 		//by loading of the page the player's money is:
 		money = 1000;
 		//run a new game
