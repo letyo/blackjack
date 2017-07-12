@@ -436,7 +436,7 @@ function check_bust(player) {
 
 	//hide/show the buttons, write out the result and prize
 	if (bust === true) {
-		result = "This is a bust! The " + player.name + " goes bust. The other player is the winner!";
+		result = "The " + player.name + " goes bust. The other player is the winner!";
 		winner = "!" + player.name;
 		console.log("This is a bust!");
 		console.log("Bust by " + player.name + ". The other player is the winner!");
@@ -538,7 +538,8 @@ function get_bet() {
 	//empty the playing field, the result's field, the bet field and the prize field
 	$(".cards, #result, .total_points, #bet, #prize").empty();
 	//empty the variables
-	result = "";
+	result = "Result field";
+	show_result();
 	bet = 0;
 	prize = 0;
 	//gives the value of the variables of the beginning of the game
@@ -609,7 +610,7 @@ function deal() {
 		//after checking blackjack
 		if (dealer.blackjack === true && player1.blackjack === true) {
 			push = true;
-			result = "The dealer and also the player1 have blackjack! This is a push!";
+			result = "All of the participants have blackjack! This is a push!";
 			winner = "push";
 			console.log("The dealer and the player1 also have blackjack! This is a push!");
 		} else if (dealer.blackjack === true) {
@@ -688,7 +689,8 @@ function lets_play() {
 	//empty the playing field, the result's field, the bet field and the prize field
 	$(".cards, #result, .total_points, #bet, #prize").empty();
 	//empty the variables
-	result = "";
+	result = "Result field";
+	show_result();
 	bet = 0;
 	prize = 0;
 	deck = [];
