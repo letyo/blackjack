@@ -1,19 +1,19 @@
-// variables
+// Get the options-modal
 var $options_modal = $("#options");
 
-// Get the reg-modal
+// Get the rules-modal
 var $rules_modal = $("#rules");
 
-// Get the login-button that opens the modal
+// Get the options-button that opens the modal
 var $options_btn = $("#options_button");
 
-// Get the reg-button that opens the modal
+// Get the rules-button that opens the modal
 var $rules_btn = $("#rules_button");
 
-// Get the login_close element that closes the modal
+// Get the options_close element that closes the modal
 var $options_close = $("#options_close");
 
-// Get the reg_close element that closes the modal
+// Get the rules_close element that closes the modal
 var $rules_close = $("#rules_close");
 
 
@@ -66,4 +66,3 @@ $rules_btn.click(function() {
 $("#save_and_play").click(function() {
     $options_modal.css("display", "none");
 })
-
