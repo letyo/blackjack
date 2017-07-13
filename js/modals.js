@@ -53,7 +53,6 @@ $(window).keydown(function(event) {
 // When the user clicks on the button, open the options_modal
 $options_btn.click(function() {
     $options_modal.css("display", "block");
-    console.log($("body").attr("class"));
 })
 
 // When the user clicks on the button, open the rules_modal
