@@ -15,7 +15,12 @@ body {
   #header button {
     font-weight: bold;
     margin-left: 25px;
-    margin-right: 25px; }
+    margin-right: 25px;
+    border-radius: 5px; }
+  #header button:hover {
+    border: 1px solid rgba(40, 0, 80, 0.5);
+    background-color: rgba(55, 0, 110, 0.5);
+    color: #bdbdbd; }
 
 #whole_table {
   border: 20px solid #452209;
