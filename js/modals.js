@@ -30,15 +30,13 @@ $rules_close.click(function() {
 
 
 
-/* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx vmi miatt nem működik xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
 // When the user clicks anywhere outside of the modal, close it
 $(window).click(function(event) {
-    if (event.target === $options_modal || event.target === $rules_modal) { 
+    if (!$(event.target).closest(".modal_content").length && !$(event.target).is($(".modal_button"))) {
         $options_modal.css("display", "none");
         $rules_modal.css("display", "none");
-    }
+    } 
 })
-/* xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx vmi miatt nem működik xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */
 
 
 
@@ -55,6 +53,7 @@ $(window).keydown(function(event) {
 // When the user clicks on the button, open the options_modal
 $options_btn.click(function() {
     $options_modal.css("display", "block");
+    console.log($("body").attr("class"));
 })
 
 // When the user clicks on the button, open the rules_modal
@@ -68,3 +67,4 @@ $rules_btn.click(function() {
 $("#save_and_play").click(function() {
     $options_modal.css("display", "none");
 })
+
