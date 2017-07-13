@@ -1,4 +1,4 @@
-It's a simple blackjack game, wirtten in jQuery and SCSS.
+It's a simple blackjack game, written in jQuery and SCSS.
 
 You can choose:
 - with how many decks do you want to play
