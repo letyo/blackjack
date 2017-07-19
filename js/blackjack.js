@@ -508,13 +508,23 @@ function hit(player) {
 function double(player) {
 	//change the bet and with that the money too
 	bet = 2 * bet;
-	money = money - bet;
-	show_bet();
-	show_money();
-	//draw
-	hit(player);
-	if (bust === false) {
-		stand();
+	money = money - (bet / 2);
+	if (money < 0) {
+		//check the player's money
+		alert("You don't have enough money to double! The system take your double as a hit!");
+		bet = bet / 2;
+		money = money + bet;
+		show_bet();
+		show_money();
+		hit(player);
+	} else {
+		show_bet();
+		show_money();
+		//draw
+		hit(player);
+		if (bust === false) {
+			stand();
+		}
 	}
 }
 
@@ -555,6 +565,12 @@ function get_bet() {
 	//empty the hands of the players
 	dealer.cards = [];
 	player1.cards = [];
+
+	//check the player's money
+	if (money <= 0) {
+		alert("You don't have any money! You have to start a new game!");
+		lets_play();
+	}
 
 	//put in the bet
 	bet = parseInt($("input[name=get_bet]").val());
