@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Win or loose, this is the best game!</title>
+	<link rel="icon" type="image/png" href="img/favicon.png"/>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link type="text/css" rel="stylesheet" href="css/main.css"/>
@@ -15,8 +16,8 @@
 
 	<div id="header">
 		<button id="new">New game</buttons>
-		<button id="options_button">Options</button>
-		<button id="rules_button">Rules</button>
+		<button id="options_button" class="modal_button">Options</button>
+		<button id="rules_button" class="modal_button">Rules</button>
 	</div>
 
 <!-- xxxxxxxxxxxxxxxxxxxxxxxx the modals xxxxxxxxxxxxxxxxxxxxxxxx -->
